@@ -2,18 +2,13 @@ package us.car.accidents.utils;
 
 
 import us.car.accidents.core.CarAccident;
-import us.car.accidents.types.Fall;
-import us.car.accidents.types.GeoLocation;
-import us.car.accidents.types.NameType;
+
 
 public class CarAccidentParser {
 
 
     /**
-     * Converts the CSV input file to objects of the class MeteoriteLanding
-     *
-     * @param @String line
-     * @return @MeteoriteLanding
+     * Converts the CSV input file to objects of the class CarAccident
      */
     public CarAccident csvLineToCarAccident(String line) {
         CarAccident carAccident = new CarAccident();
