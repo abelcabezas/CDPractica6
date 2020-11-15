@@ -1,16 +1,14 @@
 package us.car.accidents.core;
 
-import us.car.accidents.types.Fall;
-import us.car.accidents.types.GeoLocation;
-import us.car.accidents.types.NameType;
+
 
 public class CarAccident {
 
-    String severity;
-    float distance;
-    String side;
-    String w_condition;
-    float visibility;
+    private  String severity;
+    private float distance;
+    private String side;
+    private String w_condition;
+    private float visibility;
 
     public CarAccident() {
 
