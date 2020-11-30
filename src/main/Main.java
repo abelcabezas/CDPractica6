@@ -46,7 +46,7 @@ public class Main {
             context.write(key, new FloatWritable(sum / i));
         }
     }
-
+    //TODO THIS IS WORKING
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
