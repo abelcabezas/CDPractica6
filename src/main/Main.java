@@ -24,7 +24,7 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create a sintetic index since it will be a sum of all of the values, we do not split by key
-            context.write(new Text(carAccident.getSide()), new FloatWritable(carAccident.getDistance()));
+            context.write(new Text(carAccident.getSide()!=null ? carAccident.getSide() : ""), new FloatWritable(carAccident.getDistance()));
         }
 
     }
