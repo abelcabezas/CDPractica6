@@ -18,19 +18,19 @@ import us.car.accidents.utils.CarAccidentParser;
 
 public class Main {
 
-    public static class MediumDistanceFloatMapper extends Mapper<Object, Text, Text, FloatWritable> {
+    public static class MediumDistanceFloatMapper extends Mapper<Object, Text, IntWritable, FloatWritable> {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create a sintetic index since it will be a sum of all of the values, we do not split by key
-            context.write(new Text(carAccident.getSide()!=null ? carAccident.getSide() : ""), new FloatWritable(carAccident.getDistance()));
+            context.write(new IntWritable(1), new FloatWritable(carAccident.getDistance()));
         }
 
     }
-    public static class MediumDistanceSumReducer extends Reducer<Text, FloatWritable, Text, FloatWritable> {
+    public static class MediumDistanceSumReducer extends Reducer<IntWritable, FloatWritable, IntWritable, FloatWritable> {
         // Reduce method
-        public void reduce(Text key, Iterable<FloatWritable> values, Context context)
+        public void reduce(IntWritable key, Iterable<FloatWritable> values, Context context)
                 throws IOException, InterruptedException {
             float sum = 0f;
             int i = 0;
@@ -46,7 +46,7 @@ public class Main {
             context.write(key, new FloatWritable(sum / i));
         }
     }
-    //TODO THIS IS WORKING
+
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
