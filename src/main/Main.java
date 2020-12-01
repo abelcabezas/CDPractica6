@@ -123,11 +123,13 @@ public class Main {
 
     public static class MostCommonConditionReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
+        int max = 0;
+        Text keyWithMax =  new Text("");
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-            int max = 0;
-            Text keyWithMax =  new Text("");
+
+
             //We iterate over all of the values of the keys (get the sum of the distance and the
             // elements)
             for (IntWritable val : values) {
@@ -143,6 +145,10 @@ public class Main {
             }
             // Get the total amount of cases per severity and write in the context the key and the number of occurences
 
+        }
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            context.write(keyWithMax, new IntWritable(max));
         }
     }
 
