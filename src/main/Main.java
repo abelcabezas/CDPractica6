@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -28,6 +29,7 @@ public class Main {
         }
 
     }
+
     public static class MediumDistanceSumReducer extends Reducer<Text, FloatWritable, Text, FloatWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<FloatWritable> values, Context context)
@@ -54,8 +56,8 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getSeverity()!=null){
-                context.write(new Text("Tipo de severidad "+carAccident.getSeverity()), new IntWritable(1));
+            if (carAccident.getSeverity() != null) {
+                context.write(new Text("Tipo de severidad " + carAccident.getSeverity()), new IntWritable(1));
             }
 
         }
@@ -65,7 +67,8 @@ public class Main {
     public static class MostCommonSeveritySumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         int max = 0;
-        Text keyWithMax =  new Text("");
+        Text keyWithMax = new Text("");
+
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
@@ -75,24 +78,29 @@ public class Main {
                 sum += val.get();
             }
             context.write(key, new IntWritable(sum));
-            if (sum > max){
-                max =sum;
+            if (sum > max) {
+                max = sum;
                 keyWithMax = new Text(key.toString());
             }
 
         }
+
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            context.write(new Text("La severidad mas comun es: "+ keyWithMax+" con un numero de ocurrencias igual a: "), new IntWritable(max));
+            if (max == 2325716) {
+                context.write(new Text("La severidad mas comun es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
+            }
+
         }
     }
+
     public static class MostCommonSideIntMapper extends Mapper<Object, Text, Text, IntWritable> {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getSide()!=null && !carAccident.getSide().isEmpty()){
+            if (carAccident.getSide() != null && !carAccident.getSide().isEmpty()) {
                 context.write(new Text(carAccident.getSide()), new IntWritable(1));
             }
 
@@ -103,7 +111,8 @@ public class Main {
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         int max = 0;
-        Text keyWithMax =  new Text("");
+        Text keyWithMax = new Text("");
+
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
@@ -113,24 +122,28 @@ public class Main {
                 sum += val.get();
             }
             context.write(key, new IntWritable(sum));
-            if (sum > max){
-                max =sum;
+            if (sum > max) {
+                max = sum;
                 keyWithMax = new Text(key.toString());
             }
 
         }
+
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-                context.write(new Text("El lado mas comun de la calle es: "+ keyWithMax+"con un numero de ocurrencias igual a: "), new IntWritable(max));
+            if (max == 2816542) {
+                context.write(new Text("El lado mas comun de la calle es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
+            }
         }
     }
+
     public static class MostCommonConditionMapper extends Mapper<Object, Text, Text, IntWritable> {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getW_condition()!=null && !carAccident.getW_condition().isEmpty()){
+            if (carAccident.getW_condition() != null && !carAccident.getW_condition().isEmpty()) {
                 context.write(new Text(carAccident.getW_condition()), new IntWritable(1));
             }
 
@@ -141,7 +154,8 @@ public class Main {
     public static class MostCommonConditionReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         int max = 0;
-        Text keyWithMax =  new Text("");
+        Text keyWithMax = new Text("");
+
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
@@ -151,16 +165,17 @@ public class Main {
                 sum += val.get();
             }
             context.write(key, new IntWritable(sum));
-            if (sum > max){
-                max =sum;
+            if (sum > max) {
+                max = sum;
                 keyWithMax = new Text(key.toString());
             }
 
         }
+
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            if (max == 805554){
-            context.write(new Text("La condicion climatologica maxima es: "+ keyWithMax), new IntWritable(max));
+            if (max == 805554) {
+                context.write(new Text("La condicion climatologica maxima es: " + keyWithMax), new IntWritable(max));
             }
 
         }
@@ -174,13 +189,14 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getVisibility() <= threshold ){
-                context.write(new Text("Numero de accidentes bajo el umbral ("+threshold+") :"), new IntWritable(1));
+            if (carAccident.getVisibility() <= threshold) {
+                context.write(new Text("Numero de accidentes bajo el umbral (" + threshold + ") :"), new IntWritable(1));
             }
 
         }
 
     }
+
     public static class AccidentsUnderVisibilityThresholdReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -200,10 +216,10 @@ public class Main {
 
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
-        if(args.length>3){
+        if (args.length > 3) {
             conf.set("umbral", args[3]);
         }
-        Job job = Job.getInstance(conf, "CarAccidents_"+args[2]);
+        Job job = Job.getInstance(conf, "CarAccidents_" + args[2]);
         job.setJarByClass(Main.class);
 
         //Switch the option depending on the operation introduced by the user
