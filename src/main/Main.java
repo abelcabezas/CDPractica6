@@ -138,7 +138,6 @@ public class Main {
                 max =sum;
                 keyWithMax = new Text(key.toString());
             }
-            context.write(key, new IntWritable(sum));
 
         }
         @Override
