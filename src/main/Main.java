@@ -145,7 +145,7 @@ public class Main {
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
             if(carAccident.getVisibility() < threshold ){
-                context.write(new Text("Accidentes: "+carAccident.getW_condition()), new IntWritable(1));
+                context.write(new Text("Accidentes: "), new IntWritable(1));
             }
 
         }
