@@ -32,7 +32,7 @@ public class Main {
         // Reduce method
         public void reduce(Text key, Iterable<FloatWritable> values, Context context)
                 throws IOException, InterruptedException {
-            float sum = 0f;
+            float sum = 0;
             int i = 0;
 
             //We iterate over all of the values of the keys (get the sum of the distance and the
@@ -169,10 +169,12 @@ public class Main {
     }
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
-        conf.set("user_selection", args[2]);
+        if(args.length>3){
+            conf.set("umbral", args[3]);
+        }
         Job job = Job.getInstance(conf, "CarAccidents");
         job.setJarByClass(Main.class);
-        //TODO set mapper, reducer and combiner depending on the option
+
         //Switch the option depending on the operation introduced by the user
         if (args[2].equals("1")) {
             job.setMapperClass(MostCommonSeverityIntMapper.class);
@@ -203,7 +205,6 @@ public class Main {
             job.setOutputValueClass(IntWritable.class);
         }
         if (args[2].equals("5")) {
-            conf.set("umbral", args[3]);
             job.setMapperClass(AccidentsUnderVisibilityThresholdMapper.class);
             job.setCombinerClass(AccidentsUnderVisibilityThresholdReducer.class);
             job.setReducerClass(AccidentsUnderVisibilityThresholdReducer.class);
