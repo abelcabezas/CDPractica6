@@ -1,7 +1,6 @@
 package main;
 
 import java.io.IOException;
-
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -29,7 +28,6 @@ public class Main {
         }
 
     }
-
     public static class MediumDistanceSumReducer extends Reducer<Text, FloatWritable, Text, FloatWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<FloatWritable> values, Context context)
@@ -56,14 +54,13 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if (carAccident.getSeverity() != null) {
-                context.write(new Text("Tipo de severidad " + carAccident.getSeverity()), new IntWritable(1));
+            if(carAccident.getSeverity()!=null){
+                context.write(new Text("Tipo de severidad "+carAccident.getSeverity()), new IntWritable(1));
             }
 
         }
 
     }
-
     public static class MostCommonSeveritySumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -87,14 +84,14 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if (carAccident.getSide() != null) {
-                context.write(new Text(carAccident.getSide()), new IntWritable(1));
+            if(carAccident.getSide()!=null){
+                context.write(new Text("Lado "+carAccident.getSide()), new IntWritable(1));
+
             }
 
         }
 
     }
-
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -111,7 +108,6 @@ public class Main {
             context.write(key, new IntWritable(sum));
         }
     }
-
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
