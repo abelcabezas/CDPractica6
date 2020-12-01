@@ -138,9 +138,8 @@ public class Main {
                 if (val.get() > max) {
                     max = val.get();
                     keyWithMax = new Text(key.toString());
-                    context.write(keyWithMax, new IntWritable(sum));
                 }
-
+                context.write(keyWithMax, new IntWritable(sum));
             }
             // Get the total amount of cases per severity and write in the context the key and the number of occurences
 
