@@ -114,7 +114,7 @@ public class Main {
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
             if(carAccident.getW_condition()!=null && !carAccident.getW_condition().isEmpty()){
-                context.write(new Text("Condicion climatologica "+carAccident.getW_condition()), new IntWritable(1));
+                context.write(new Text(carAccident.getW_condition()), new IntWritable(1));
             }
 
         }
@@ -133,7 +133,7 @@ public class Main {
             for (IntWritable val : values) {
                 sum += val.get();
             }
-
+            context.write(key, new IntWritable(sum));
             if (sum > max){
                 max =sum;
                 keyWithMax = new Text(key.toString());
@@ -142,7 +142,7 @@ public class Main {
         }
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            context.write(keyWithMax, new IntWritable(max));
+            context.write(new Text("La condicion climatologica maxima es: "+ keyWithMax), new IntWritable(max));
         }
     }
 
