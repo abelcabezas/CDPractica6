@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -28,6 +29,7 @@ public class Main {
         }
 
     }
+
     public static class MediumDistanceSumReducer extends Reducer<Text, FloatWritable, Text, FloatWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<FloatWritable> values, Context context)
@@ -54,13 +56,14 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getSeverity()!=null){
-                context.write(new Text("Tipo de severidad "+carAccident.getSeverity()), new IntWritable(1));
+            if (carAccident.getSeverity() != null) {
+                context.write(new Text("Tipo de severidad " + carAccident.getSeverity()), new IntWritable(1));
             }
 
         }
 
     }
+
     public static class MostCommonSeveritySumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -84,18 +87,14 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getSide()!=null){
-                if(carAccident.getSide()=="R"){
-                    context.write(new Text("Lado derecho: "+carAccident.getSide()), new IntWritable(1));
-                }
-                else if(carAccident.getSide()=="L"){
-                    context.write(new Text("Lado izquierdo: "+carAccident.getSide()), new IntWritable(1));
-                }
+            if (carAccident.getSide() != null) {
+                context.write(new Text(carAccident.getSide()), new IntWritable(1));
             }
 
         }
 
     }
+
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -112,6 +111,7 @@ public class Main {
             context.write(key, new IntWritable(sum));
         }
     }
+
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
@@ -140,7 +140,6 @@ public class Main {
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
-
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
