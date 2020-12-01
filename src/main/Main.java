@@ -84,9 +84,13 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            if(carAccident.getSide()!=null){
-                context.write(new Text("Lado "+carAccident.getSide()), new IntWritable(1));
-
+            if(carAccident.getSide()!=null && !carAccident.getSide().isEmpty()){
+                if (carAccident.getSide().trim() == "R" ){
+                context.write(new Text("Lado izquierdo: "+carAccident.getSide()), new IntWritable(1));
+                }
+                else if (carAccident.getSide().trim() == "L" ){
+                    context.write(new Text("Lado derecho: "+carAccident.getSide()), new IntWritable(1));
+                }
             }
 
         }
