@@ -172,7 +172,7 @@ public class Main {
         if(args.length>3){
             conf.set("umbral", args[3]);
         }
-        Job job = Job.getInstance(conf, "CarAccidents");
+        Job job = Job.getInstance(conf, "CarAccidents"+args[2]);
         job.setJarByClass(Main.class);
 
         //Switch the option depending on the operation introduced by the user
