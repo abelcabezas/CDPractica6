@@ -156,15 +156,22 @@ public class Main {
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-
+            int max = 0;
+            Text keyWithMax =  new Text("");
             //We iterate over all of the values of the keys (get the sum of the distance and the
             // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
-
+            //TODO TEST
+            for (IntWritable val : values) {
+                if (val.get() > max) {
+                    max = val.get();
+                    keyWithMax = new Text(key.toString());
+                }
+            }
             // Get the total amount of cases per severity and write in the context the key and the number of occurences
-            context.write(key, new IntWritable(sum));
+            context.write(keyWithMax, new IntWritable(max));
         }
     }
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
