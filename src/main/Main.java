@@ -125,37 +125,6 @@ public class Main {
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-
-            //We iterate over all of the values of the keys (get the sum of the distance and the
-            // elements)
-            for (IntWritable val : values) {
-                sum += val.get();
-            }
-
-            // Get the total amount of cases per severity and write in the context the key and the number of occurences
-            context.write(key, new IntWritable(sum));
-        }
-    }
-    public static class AccidentsUnderVisibilityThresholdMapper extends Mapper<Object, Text, Text, IntWritable> {
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
-            Configuration conf = context.getConfiguration();
-            float threshold = Integer.parseInt(conf.get("umbral"));
-            CarAccidentParser parser = new CarAccidentParser();
-            CarAccident carAccident = parser.csvLineToCarAccident(line);
-            //Create Add one to the type of severity
-            if(carAccident.getVisibility() < threshold ){
-                context.write(new Text("Numero de accidentes bajo el umbral ("+threshold+") :"), new IntWritable(1));
-            }
-
-        }
-
-    }
-    public static class AccidentsUnderVisibilityThresholdReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        // Reduce method
-        public void reduce(Text key, Iterable<IntWritable> values, Context context)
-                throws IOException, InterruptedException {
-            int sum = 0;
             int max = 0;
             Text keyWithMax =  new Text("");
             //We iterate over all of the values of the keys (get the sum of the distance and the
@@ -171,9 +140,42 @@ public class Main {
                 }
             }
             // Get the total amount of cases per severity and write in the context the key and the number of occurences
-            context.write(keyWithMax, new IntWritable(max));
+            context.write(keyWithMax, new IntWritable(sum));
         }
     }
+
+    public static class AccidentsUnderVisibilityThresholdMapper extends Mapper<Object, Text, Text, IntWritable> {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            Configuration conf = context.getConfiguration();
+            float threshold = Integer.parseInt(conf.get("umbral"));
+            CarAccidentParser parser = new CarAccidentParser();
+            CarAccident carAccident = parser.csvLineToCarAccident(line);
+            //Create Add one to the type of severity
+            if(carAccident.getVisibility() <= threshold ){
+                context.write(new Text("Numero de accidentes bajo el umbral ("+threshold+") :"), new IntWritable(1));
+            }
+
+        }
+
+    }
+    public static class AccidentsUnderVisibilityThresholdReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        // Reduce method
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+
+            //We iterate over all of the values of the keys (get the sum of the distance and the
+            // elements)
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // Get the total amount of cases per severity and write in the context the key and the number of occurences
+            context.write(key, new IntWritable(sum));
+        }
+    }
+
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         if(args.length>3){
