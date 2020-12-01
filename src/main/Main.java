@@ -47,6 +47,34 @@ public class Main {
         }
     }
 
+
+    public static class MostCommonSeverityIntMapper extends Mapper<Object, Text, Text, IntWritable> {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            CarAccidentParser parser = new CarAccidentParser();
+            CarAccident carAccident = parser.csvLineToCarAccident(line);
+            //Create Add one to the type of severity
+            context.write(new Text(carAccident.getSeverity()), new IntWritable(1));
+        }
+
+    }
+    public static class MostCommonSeveritySumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        // Reduce method
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+
+            //We iterate over all of the values of the keys (get the sum of the distance and the
+            // elements)
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // Get the total amount of cases per severity and write in the context the key and the number of occurences
+            context.write(key, new IntWritable(sum));
+        }
+    }
+
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
@@ -54,6 +82,13 @@ public class Main {
         job.setJarByClass(Main.class);
         //TODO set mapper, reducer and combiner depending on the option
         //Switch the option depending on the operation introduced by the user
+        if (args[2].equals("1")) {
+            job.setMapperClass(MostCommonSeverityIntMapper.class);
+            job.setCombinerClass(MostCommonSeveritySumReducer.class);
+            job.setReducerClass(MostCommonSeveritySumReducer.class);
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(IntWritable.class);
+        }
         if (args[2].equals("2")) {
             job.setMapperClass(MediumDistanceFloatMapper.class);
             job.setCombinerClass(MediumDistanceSumReducer.class);
