@@ -54,7 +54,10 @@ public class Main {
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
             //Create Add one to the type of severity
-            context.write(new Text(carAccident.getSeverity()!=null?carAccident.getSeverity():"Unspecified type:"), new IntWritable(1));
+            if(carAccident.getSeverity()!=null){
+                context.write(new Text("Tipo de severidad "+carAccident.getSeverity()), new IntWritable(1));
+            }
+
         }
 
     }
