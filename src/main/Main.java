@@ -136,6 +136,37 @@ public class Main {
             context.write(key, new IntWritable(sum));
         }
     }
+    public static class AccidentsUnderVisibilityThresholdMapper extends Mapper<Object, Text, Text, IntWritable> {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            Configuration conf = context.getConfiguration();
+            float threshold = Integer.parseInt(conf.get("umbral"));
+            CarAccidentParser parser = new CarAccidentParser();
+            CarAccident carAccident = parser.csvLineToCarAccident(line);
+            //Create Add one to the type of severity
+            if(carAccident.getVisibility() < threshold ){
+                context.write(new Text("Accidentes: "+carAccident.getW_condition()), new IntWritable(1));
+            }
+
+        }
+
+    }
+    public static class AccidentsUnderVisibilityThresholdReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        // Reduce method
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+
+            //We iterate over all of the values of the keys (get the sum of the distance and the
+            // elements)
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // Get the total amount of cases per severity and write in the context the key and the number of occurences
+            context.write(key, new IntWritable(sum));
+        }
+    }
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
@@ -168,6 +199,14 @@ public class Main {
             job.setMapperClass(MostCommonConditionMapper.class);
             job.setCombinerClass(MostCommonConditionReducer.class);
             job.setReducerClass(MostCommonConditionReducer.class);
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(IntWritable.class);
+        }
+        if (args[2].equals("5")) {
+            conf.set("umbral", args[3]);
+            job.setMapperClass(AccidentsUnderVisibilityThresholdMapper.class);
+            job.setCombinerClass(AccidentsUnderVisibilityThresholdReducer.class);
+            job.setReducerClass(AccidentsUnderVisibilityThresholdReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
