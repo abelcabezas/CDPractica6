@@ -120,6 +120,7 @@ public class Main {
         }
 
     }
+
     public static class MostCommonConditionReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -137,10 +138,12 @@ public class Main {
                 if (val.get() > max) {
                     max = val.get();
                     keyWithMax = new Text(key.toString());
+                    context.write(keyWithMax, new IntWritable(sum));
                 }
+
             }
             // Get the total amount of cases per severity and write in the context the key and the number of occurences
-            context.write(keyWithMax, new IntWritable(sum));
+
         }
     }
 
@@ -181,7 +184,7 @@ public class Main {
         if(args.length>3){
             conf.set("umbral", args[3]);
         }
-        Job job = Job.getInstance(conf, "CarAccidents"+args[2]);
+        Job job = Job.getInstance(conf, "CarAccidents_"+args[2]);
         job.setJarByClass(Main.class);
 
         //Switch the option depending on the operation introduced by the user
