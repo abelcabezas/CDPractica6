@@ -61,23 +61,31 @@ public class Main {
         }
 
     }
+
     public static class MostCommonSeveritySumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
+        int max = 0;
+        Text keyWithMax =  new Text("");
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-
             //We iterate over all of the values of the keys (get the sum of the distance and the
             // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
-
-            // Get the total amount of cases per severity and write in the context the key and the number of occurences
             context.write(key, new IntWritable(sum));
+            if (sum > max){
+                max =sum;
+                keyWithMax = new Text(key.toString());
+            }
+
+        }
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            context.write(new Text("La severidad mas comun es: "+ keyWithMax+" con un numero de ocurrencias igual a: "), new IntWritable(max));
         }
     }
-
     public static class MostCommonSideIntMapper extends Mapper<Object, Text, Text, IntWritable> {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
@@ -91,20 +99,29 @@ public class Main {
         }
 
     }
+
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
+        int max = 0;
+        Text keyWithMax =  new Text("");
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-
             //We iterate over all of the values of the keys (get the sum of the distance and the
             // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
-
-            // Get the total amount of cases per severity and write in the context the key and the number of occurences
             context.write(key, new IntWritable(sum));
+            if (sum > max){
+                max =sum;
+                keyWithMax = new Text(key.toString());
+            }
+
+        }
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+                context.write(new Text("El lado mas comun de la calle es: "+ keyWithMax+"con un numero de ocurrencias igual a: "), new IntWritable(max));
         }
     }
     public static class MostCommonConditionMapper extends Mapper<Object, Text, Text, IntWritable> {
@@ -142,7 +159,10 @@ public class Main {
         }
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
+            if (max == 805554){
             context.write(new Text("La condicion climatologica maxima es: "+ keyWithMax), new IntWritable(max));
+            }
+
         }
     }
 
