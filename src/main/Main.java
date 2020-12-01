@@ -86,7 +86,7 @@ public class Main {
             //Create Add one to the type of severity
             if(carAccident.getSide()!=null && !carAccident.getSide().isEmpty()){
                 if (carAccident.getSide().trim() == "R" ){
-                context.write(new Text("Lado izquierdo: "+carAccident.getSide()), new IntWritable(1));
+                    context.write(new Text("Lado izquierdo: "+carAccident.getSide()), new IntWritable(1));
                 }
                 else if (carAccident.getSide().trim() == "L" ){
                     context.write(new Text("Lado derecho: "+carAccident.getSide()), new IntWritable(1));
@@ -97,6 +97,35 @@ public class Main {
 
     }
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        // Reduce method
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+
+            //We iterate over all of the values of the keys (get the sum of the distance and the
+            // elements)
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // Get the total amount of cases per severity and write in the context the key and the number of occurences
+            context.write(key, new IntWritable(sum));
+        }
+    }
+    public static class MostCommonConditionMapper extends Mapper<Object, Text, Text, IntWritable> {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            CarAccidentParser parser = new CarAccidentParser();
+            CarAccident carAccident = parser.csvLineToCarAccident(line);
+            //Create Add one to the type of severity
+            if(carAccident.getW_condition()!=null && !carAccident.getW_condition().isEmpty()){
+                context.write(new Text("Condicion climatologica "+carAccident.getW_condition()), new IntWritable(1));
+            }
+
+        }
+
+    }
+    public static class MostCommonConditionReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
@@ -137,6 +166,13 @@ public class Main {
             job.setMapperClass(MostCommonSideIntMapper.class);
             job.setCombinerClass(MostCommonSideSumReducer.class);
             job.setReducerClass(MostCommonSideSumReducer.class);
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(IntWritable.class);
+        }
+        if (args[2].equals("4")) {
+            job.setMapperClass(MostCommonConditionMapper.class);
+            job.setCombinerClass(MostCommonConditionReducer.class);
+            job.setReducerClass(MostCommonConditionReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
