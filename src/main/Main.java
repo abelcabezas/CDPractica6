@@ -78,6 +78,40 @@ public class Main {
         }
     }
 
+    public static class MostCommonSideIntMapper extends Mapper<Object, Text, Text, IntWritable> {
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString();
+            CarAccidentParser parser = new CarAccidentParser();
+            CarAccident carAccident = parser.csvLineToCarAccident(line);
+            //Create Add one to the type of severity
+            if(carAccident.getSide()!=null){
+                if(carAccident.getSide()=="R"){
+                    context.write(new Text("Lado derecho: "+carAccident.getSide()), new IntWritable(1));
+                }
+                else if(carAccident.getSide()=="L"){
+                    context.write(new Text("Lado izquierdo: "+carAccident.getSide()), new IntWritable(1));
+                }
+            }
+
+        }
+
+    }
+    public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        // Reduce method
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+
+            //We iterate over all of the values of the keys (get the sum of the distance and the
+            // elements)
+            for (IntWritable val : values) {
+                sum += val.get();
+            }
+
+            // Get the total amount of cases per severity and write in the context the key and the number of occurences
+            context.write(key, new IntWritable(sum));
+        }
+    }
     public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         conf.set("user_selection", args[2]);
@@ -98,6 +132,13 @@ public class Main {
             job.setReducerClass(MediumDistanceSumReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(FloatWritable.class);
+        }
+        if (args[2].equals("3")) {
+            job.setMapperClass(MostCommonSideIntMapper.class);
+            job.setCombinerClass(MostCommonSideSumReducer.class);
+            job.setReducerClass(MostCommonSideSumReducer.class);
+            job.setOutputKeyClass(Text.class);
+            job.setOutputValueClass(IntWritable.class);
         }
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
