@@ -9,8 +9,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.fs.Path;
@@ -225,35 +223,30 @@ public class Main {
         //Switch the option depending on the operation introduced by the user
         if (args[2].equals("1")) {
             job.setMapperClass(MostCommonSeverityIntMapper.class);
-            job.setCombinerClass(MostCommonSeveritySumReducer.class);
             job.setReducerClass(MostCommonSeveritySumReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
         if (args[2].equals("2")) {
             job.setMapperClass(MediumDistanceFloatMapper.class);
-            job.setCombinerClass(MediumDistanceSumReducer.class);
             job.setReducerClass(MediumDistanceSumReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(FloatWritable.class);
         }
         if (args[2].equals("3")) {
             job.setMapperClass(MostCommonSideIntMapper.class);
-            job.setCombinerClass(MostCommonSideSumReducer.class);
             job.setReducerClass(MostCommonSideSumReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
         if (args[2].equals("4")) {
             job.setMapperClass(MostCommonConditionMapper.class);
-            job.setCombinerClass(MostCommonConditionReducer.class);
             job.setReducerClass(MostCommonConditionReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
         }
         if (args[2].equals("5")) {
             job.setMapperClass(AccidentsUnderVisibilityThresholdMapper.class);
-            job.setCombinerClass(AccidentsUnderVisibilityThresholdReducer.class);
             job.setReducerClass(AccidentsUnderVisibilityThresholdReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(IntWritable.class);
