@@ -85,9 +85,9 @@ public class Main {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            if (max == 2325716) {
+            //if (max == 2325716) {
                 context.write(new Text("La severidad mas comun es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
-            }
+            //}
 
         }
     }
@@ -129,9 +129,9 @@ public class Main {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            if (max == 2816542) {
+            //if (max == 2816542) {
                 context.write(new Text("El lado mas comun de la calle es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
-            }
+            //}
         }
     }
 
@@ -172,9 +172,9 @@ public class Main {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            if (max == 805554) {
+            //if (max == 805554) {
                 context.write(new Text("La condicion climatologica maxima es: " + keyWithMax), new IntWritable(max));
-            }
+            //}
 
         }
     }
