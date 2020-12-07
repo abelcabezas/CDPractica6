@@ -1,7 +1,6 @@
 package main;
 
 import java.io.IOException;
-
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -22,7 +21,7 @@ public class Main {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
-            //Create a sintetic index since it will be a sum of all of the values, we do not split by key
+            //Create a sintetic key for summing all the values
             context.write(new Text("Media"), new FloatWritable(carAccident.getDistance()));
         }
 
@@ -41,7 +40,6 @@ public class Main {
                 sum += val.get();
                 i++;
             }
-
             // Get the average and write in the context the key and the average
             context.write(key, new FloatWritable(sum / i));
         }
@@ -53,7 +51,7 @@ public class Main {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
-            //Create Add one to the type of severity
+            //Add one to the type of severity
             if (carAccident.getSeverity() != null) {
                 context.write(new Text("Tipo de severidad " + carAccident.getSeverity()), new IntWritable(1));
             }
@@ -70,7 +68,7 @@ public class Main {
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-            //We iterate over all of the values of the keys (get the sum of the distance and the
+            //We iterate over all of the keys (get the sum of the distance and the
             // elements)
             for (IntWritable val : values) {
                 sum += val.get();
@@ -85,10 +83,7 @@ public class Main {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            //if (max == 2325716) {
                 context.write(new Text("La severidad mas comun es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
-            //}
-
         }
     }
 
@@ -97,7 +92,7 @@ public class Main {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
-            //Create Add one to the type of severity
+            //Add one to the side key
             if (carAccident.getSide() != null && !carAccident.getSide().isEmpty()) {
                 context.write(new Text(carAccident.getSide()), new IntWritable(1));
             }
@@ -107,15 +102,11 @@ public class Main {
     }
 
     public static class MostCommonSideSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        // Reduce method
         int max = 0;
         Text keyWithMax = new Text("");
-
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-            //We iterate over all of the values of the keys (get the sum of the distance and the
-            // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
@@ -126,12 +117,9 @@ public class Main {
             }
 
         }
-
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            //if (max == 2816542) {
                 context.write(new Text("El lado mas comun de la calle es: " + keyWithMax + " con un numero de ocurrencias igual a: "), new IntWritable(max));
-            //}
         }
     }
 
@@ -140,7 +128,6 @@ public class Main {
             String line = value.toString();
             CarAccidentParser parser = new CarAccidentParser();
             CarAccident carAccident = parser.csvLineToCarAccident(line);
-            //Create Add one to the type of severity
             if (carAccident.getW_condition() != null && !carAccident.getW_condition().isEmpty()) {
                 context.write(new Text(carAccident.getW_condition()), new IntWritable(1));
             }
@@ -150,15 +137,12 @@ public class Main {
     }
 
     public static class MostCommonConditionReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        // Reduce method
         int max = 0;
         Text keyWithMax = new Text("");
 
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-            //We iterate over all of the values of the keys (get the sum of the distance and the
-            // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
@@ -172,10 +156,7 @@ public class Main {
 
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
-            //if (max == 805554) {
                 context.write(new Text("La condicion climatologica maxima es: " + keyWithMax), new IntWritable(max));
-            //}
-
         }
     }
 
@@ -196,18 +177,12 @@ public class Main {
     }
 
     public static class AccidentsUnderVisibilityThresholdReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        // Reduce method
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             int sum = 0;
-
-            //We iterate over all of the values of the keys (get the sum of the distance and the
-            // elements)
             for (IntWritable val : values) {
                 sum += val.get();
             }
-
-            // Get the total amount of cases per severity and write in the context the key and the number of occurences
             context.write(key, new IntWritable(sum));
         }
     }
